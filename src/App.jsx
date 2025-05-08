@@ -2,57 +2,73 @@ import { useEffect, useState } from 'react'
 import './App.css'
 
 function App() {
-  const [vida, setVida] = useState(5)
+  const [vida, setVida] = useState(100)
   const [vivo, setVivo] = useState(true)
+  const [imagem, setImagem] = useState('/imgs/pinguim td fudido vivo.png')
+  const [mensagem, setMensagem] = useState('Saudável')
+
+  
   useEffect(() => {
-    
     const intervalo = setInterval(() => {
-      if(vida <= 0){
-        setVivo(false)
-        clearInterval(intervalo)
-        return 0
-        
-      }
-      setVida((vidaAtual) => vidaAtual - 1)
-      
-  
-      
-      
-
-      
-  
-  
+      setVida((vidaAtual) => {
+        if (vidaAtual <= 0) {
+          clearInterval(intervalo)
+          setVivo(false)
+          return 0
+        }
+        return vidaAtual - 1
+      })
     }, 500)
-    // console.log(vida);
+
     return () => clearInterval(intervalo)
-  },[vida])
+  }, [])
 
-  function curar(){
+  // Atualiza imagem sempre que a vida mudar
+  useEffect(() => {
+    atualizarImagem()
+  }, [vida])
 
-    if(vivo){
-      if(vida <= 90){
+ 
+  function curar() {
+    if (vivo) {
+      if (vida <= 90) {
         setVida(vida + 10)
-        
-      }else{
+      } else {
         setVida(100)
       }
-    }else{
+    } else {
       alert("Não tem mais cura...")
     }
-      
-    console.log(vida);
-      
+  }
+
+  // Define qual imagem mostrar de acordo com a vida
+  function atualizarImagem() {
+    if (vida <= 0) {
+      setImagem('/imgs/pinguim td fudido morto.png')
+      setMensagem('Morto☠️')
+    } else if (vida < 20) {
+      setImagem('/imgs/pinguim td fudido doente.png')
+      setMensagem('Estou doente me cure😢')
+    } else if (vida > 20) {
+      setImagem('/imgs/pinguim td fudido vivo.png')
+      setMensagem('Saudável👍😁')
+    }
   }
 
   return (
     <>
-      Vida: {vida}
-      <button onClick={curar}>Curar</button>
       <div>
-        {vivo ? <p>Vivo</p> : <p>Morto</p>}
+        <img src={imagem} alt="Tamagotchi" className="imagem" />
       </div>
 
-      
+      <div>Vida: {vida}</div>
+
+      <button onClick={curar}>Curar</button>
+
+      <div>
+      <p>{mensagem}</p>
+
+      </div>
     </>
   )
 }
