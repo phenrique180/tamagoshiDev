@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import './App.css'
 
 function App() {
-  const [vida, setVida] = useState(100)
+  const [vida, setVida] = useState(10)
   const [vivo, setVivo] = useState(true)
   const [imagem, setImagem] = useState('/imgs/pinguim td fudido vivo.png')
   const [mensagem, setMensagem] = useState('Saudável')
-  const [fome, setFome] = useState(100)
+  const [fome, setFome] = useState(10)
 
   
   useEffect(() => {
@@ -15,6 +15,7 @@ function App() {
         if (vidaAtual <= 0) {
           clearInterval(intervalo)
           setVivo(false)
+          setFome(0)
           return 0
         }
         return vidaAtual - 1
@@ -26,14 +27,16 @@ function App() {
 
   useEffect(() => {
     const intervaloFome = setInterval(() => {
+      console.log(vida)
       setFome((fomeAtual) => {
-        if (fomeAtual > 0) {
+        if (fomeAtual > 0 && vida > 0) {
           return fomeAtual - 1
         } else {
-          // Fome chegou a zero, pode começar a tirar vida
+          
           setVida((vidaAtual) => Math.max(0, vidaAtual - 1))
           return 0
         }
+        
       })
     }, 500)
   
@@ -41,7 +44,7 @@ function App() {
   }, [])
   
 
-  // Atualiza imagem sempre que a vida mudar
+  
   useEffect(() => {
     atualizarImagem()
   }, [vida])
@@ -73,6 +76,8 @@ function App() {
       alert("Não tem mais cura...")
     }
   }
+
+  
 
   // Define qual imagem mostrar de acordo com a vida
   function atualizarImagem() {
