@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react'
 import './App.css'
 
 function App() {
-  const [vida, setVida] = useState(10)
+  const [vida, setVida] = useState(100)
   const [vivo, setVivo] = useState(true)
   const [imagem, setImagem] = useState('/imgs/pinguim td fudido vivo.png')
   const [mensagem, setMensagem] = useState('Saudável')
-  const [fome, setFome] = useState(10)
+  const [fome, setFome] = useState(100)
+  const [sono, setSono] = useState(10)
+  const [dormindo, setDormindo] = useState(false)
 
+// <------VIDA
   
   useEffect(() => {
     const intervalo = setInterval(() => {
@@ -16,6 +19,7 @@ function App() {
           clearInterval(intervalo)
           setVivo(false)
           setFome(0)
+          setSono(0)
           return 0
         }
         return vidaAtual - 1
@@ -25,30 +29,52 @@ function App() {
     return () => clearInterval(intervalo)
   }, [])
 
+
+  // <-----FOME----->
+  
   useEffect(() => {
     const intervaloFome = setInterval(() => {
-      console.log(vida)
       setFome((fomeAtual) => {
         if (fomeAtual > 0 && vida > 0) {
           return fomeAtual - 1
         } else {
-          
           setVida((vidaAtual) => Math.max(0, vidaAtual - 1))
           return 0
         }
-        
       })
-    }, 500)
-  
+    }, 1000)
+
     return () => clearInterval(intervaloFome)
   }, [])
   
 
+  // <-------SONO------>
+  
+  useEffect(() => {
+    const intervaloSono = setInterval(() => {
+      setSono((sonoAtual) => {
+        if (!vivo) return sonoAtual
+
+        if (dormindo) {
+          return Math.min(100, sonoAtual + 1)
+        } else {
+          return Math.max(0, sonoAtual - 1)
+          
+        }
+      })
+    }, 800)
+
+    return () => clearInterval(intervaloSono)
+  }, [vivo, dormindo])
+
+// <-----IMAGENS----->
   
   useEffect(() => {
     atualizarImagem()
-  }, [vida])
+  }, [vida, dormindo])
 
+// <-----FUNÇÕES------>
+  
   function comer() {
     if (vivo) {
       if (fome <= 90) {
@@ -61,10 +87,7 @@ function App() {
       alert("Não adianta mais comer...")
     }
   }
-  
 
-
- 
   function curar() {
     if (vivo) {
       if (vida <= 90) {
@@ -77,22 +100,30 @@ function App() {
     }
   }
 
-  
+  function dormir() {
+    if (vivo) {
+      setDormindo(!dormindo)
+    } else {
+      alert("Morto não dorme...")
+    }
+  }
 
-  // Define qual imagem mostrar de acordo com a vida
   function atualizarImagem() {
-    if (vida <= 0) {
+    if (!vivo || vida <= 0) {
       setImagem('/imgs/pinguim td fudido morto.png')
       setMensagem('Morto☠️')
+    } else if (dormindo === true) {
+      setImagem('/imgs/pinguim td fudido dormindo.png')
+      setMensagem('A mimir😴')
     } else if (vida < 20) {
       setImagem('/imgs/pinguim td fudido doente.png')
       setMensagem('Estou doente me cure😢')
-    } else if (vida > 20) {
+    } else {
       setImagem('/imgs/pinguim td fudido vivo.png')
       setMensagem('Saudável👍😁')
     }
   }
-
+  
   return (
     <>
       <div>
@@ -101,13 +132,15 @@ function App() {
 
       <div>Vida: {vida}</div>
       <div>Fome: {fome}</div>
+      <div>Sono: {sono}</div>
+      <div>Status: {dormindo ? 'Dormindo 😴' : 'Acordado 🌞'}</div>
 
       <button onClick={curar}>Curar</button>
       <button onClick={comer}>Comer</button>
+      <button onClick={dormir}>{dormindo ? 'Acordar' : 'Dormir'}</button>
 
       <div>
-      <p>{mensagem}</p>
-
+        <p>{mensagem}</p>
       </div>
     </>
   )
